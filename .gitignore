@@ -1,0 +1,7 @@
+.DS_Store
+configs
+keys/*
+logs/*
+db/
+!keys/README.md
+!logs/README.md

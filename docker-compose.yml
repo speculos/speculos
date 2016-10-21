@@ -1,0 +1,53 @@
+
+version: '2'
+
+services:
+  speculos-poloniex:
+    build: https://github.com/speculos/speculos-exchanges-poloniex.git
+    image: speculos-poloniex:0.1.0
+    environment:
+      NODE_ENV: production
+    command: node .
+    ports:
+      - "${PORT_POLONIEX}:80"
+    volumes:
+      - "./logs:/app/logs"
+      - "./keys:/app/keys"
+      - "./configs/poloniex:/app/config"
+    networks:
+      - speculos
+    depends_on:
+      - speculos-auth
+
+  speculos-auth:
+    build: https://github.com/speculos/speculos-auth.git
+    image: speculos-auth:0.1.0
+    environment:
+      NODE_ENV: production
+    command: node .
+    restart: on-failure:3
+    ports:
+      - "${PORT_AUTH}:80"
+    volumes:
+      - "./logs:/app/logs"
+      - "./keys:/app/keys"
+      - "./configs/auth:/app/config"
+    networks:
+      - speculos
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: "mongo:3.2"
+    command: mongod --storageEngine wiredTiger
+    ports:
+      - "27017:27017"
+    networks:
+      - speculos
+    volumes:
+      - "${DATABASE_DIR}:/data/db"
+
+
+networks:
+  speculos:
+    driver: bridge
